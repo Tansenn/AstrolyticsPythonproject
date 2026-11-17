@@ -4,6 +4,7 @@
 import math
 import os
 import random
+import time
 import tkinter as tk
 from datetime import datetime
 from tkinter import ttk, messagebox
@@ -52,6 +53,10 @@ class AstrolyticsApp:
         self.map_points = {}
         self.last_map_width = 0
         self.last_map_height = 0
+        self.animation_started = False
+        self.animation_job = None
+        self.animation_started_at = time.monotonic()
+        self.animation_elapsed = 0.0
 
         self.setup_window()
         self.setup_styles()
@@ -65,6 +70,7 @@ class AstrolyticsApp:
         self.set_status("Loaded " + str(count) + " " + word + ".")
         if self.load_message != "":
             self.root.after(250, self.show_load_warning)
+        self.start_orbital_animation()
 
     # ---------- window and theme ----------
 
@@ -299,6 +305,7 @@ class AstrolyticsApp:
                    (1.0, 145, 4, "#b96b5d"))
         for fraction, angle_degrees, size, color in planets:
             angle = math.radians(angle_degrees)
+            angle += self.animation_elapsed * (0.12 + fraction * 0.08)
             px = center_x + max_rx * fraction * math.cos(angle)
             py = center_y + max_ry * fraction * math.sin(angle)
             canvas.create_oval(px - size, py - size, px + size, py + size,
@@ -338,8 +345,9 @@ class AstrolyticsApp:
                           "Large": COLORS["large"]}
 
             for asteroid in asteroids:
-                angle = self.date_angle(asteroid.approach_date)
                 fraction = math.sqrt(asteroid.miss_distance_km / max_miss)
+                angle = (self.date_angle(asteroid.approach_date)
+                         + self.animation_elapsed * (0.18 + (1 - fraction) * 0.12))
                 rx = 34 + fraction * (max_rx - 34)
                 ry = 24 + fraction * (max_ry - 24)
                 x = center_x + rx * math.cos(angle)
@@ -367,6 +375,27 @@ class AstrolyticsApp:
 
         canvas.create_text(width - 10, height - 8, text="Not to scale",
                            anchor="se", fill="#536789", font=("Segoe UI", 7))
+
+    def start_orbital_animation(self):
+        if self.animation_started:
+            return
+        self.animation_started = True
+        self.animation_elapsed = 0.0
+        self.animate_orbital_map()
+
+    def animate_orbital_map(self):
+        if not self.animation_started:
+            return
+        self.animation_elapsed = time.monotonic() - self.animation_started_at
+        self.draw_orbital_map()
+        self.animation_job = self.root.after(50, self.animate_orbital_map)
+
+    def close_app(self):
+        self.animation_started = False
+        if self.animation_job is not None:
+            self.root.after_cancel(self.animation_job)
+            self.animation_job = None
+        self.root.destroy()
 
     def date_angle(self, date_text):
         date_object = datetime.strptime(date_text, "%Y-%m-%d")
@@ -1030,7 +1059,8 @@ class AstrolyticsApp:
 
 def main():
     root = tk.Tk()
-    AstrolyticsApp(root)
+    app = AstrolyticsApp(root)
+    root.protocol("WM_DELETE_WINDOW", app.close_app)
     root.mainloop()
 
 

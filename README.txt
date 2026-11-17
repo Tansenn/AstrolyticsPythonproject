@@ -65,6 +65,8 @@ HOW TO USE
 
 You can also click a dot on the map to select that asteroid in the table.
 A dot gets a ring when the asteroid is on your watchlist.
+The orbital map animates the planets and asteroid dots. It is still an
+illustration, not a real orbit simulation.
 
 Size categories:  Small = under 50 m, Medium = 50 to 300 m, Large = over 300 m
 
