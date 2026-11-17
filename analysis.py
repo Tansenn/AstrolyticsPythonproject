@@ -1,5 +1,4 @@
-# analysis.py
-# NumPy is used here only for the statistics.
+
 
 import numpy as np
 
@@ -7,19 +6,19 @@ from manager import SIZE_CATEGORIES
 
 
 def calculate_stats(values):
-    # Turn a normal Python list into a NumPy array, then calculate five numbers.
+    
     data = np.array(values, dtype=float)
     return {
         "average": float(np.mean(data)),
         "minimum": float(np.min(data)),
         "maximum": float(np.max(data)),
         "median": float(np.median(data)),
-        "std_dev": float(np.std(data)),   # population standard deviation
+        "std_dev": float(np.std(data)),   
     }
 
 
 def get_all_statistics(asteroids):
-    # Returns statistics for diameter, speed and miss distance.
+   
     if len(asteroids) == 0:
         return {}
 
@@ -39,8 +38,7 @@ def get_all_statistics(asteroids):
 
 
 def find_unusual(asteroids):
-    # Returns a list of (asteroid, list_of_reasons).
-    # The three rules are checked with plain if statements.
+   
     if len(asteroids) == 0:
         return []
 
@@ -82,7 +80,7 @@ def find_unusual(asteroids):
 
 
 def count_by_size(asteroids):
-    # Returns a dictionary like {"Small": 3, "Medium": 5, "Large": 4}.
+   
     counts = {}
     for category in SIZE_CATEGORIES:
         counts[category] = 0
