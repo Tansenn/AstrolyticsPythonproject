@@ -1,6 +1,4 @@
-# validation.py
-# Functions that check user input before it goes into a record.
-# Each function returns (True, clean_value) or (False, error_message).
+
 
 import math
 from datetime import datetime
@@ -18,7 +16,7 @@ def check_text(value, field_name):
 
 
 def check_positive_number(value, field_name):
-    # Convert the text to a number and reject zero, negatives, nan and inf.
+    
     try:
         number = float(value)
     except (TypeError, ValueError):
@@ -30,21 +28,21 @@ def check_positive_number(value, field_name):
 
 
 def check_duplicate_id(asteroid_id, existing_ids):
-    # existing_ids is the set kept by the manager.
+   
     if asteroid_id in existing_ids:
         return False, "ID " + asteroid_id + " already exists. Use a different ID."
     return True, asteroid_id
 
 
 def check_date(value):
-    # The date must be a real calendar date written exactly as YYYY-MM-DD.
+   
     text = str(value).strip()
     try:
         date_object = datetime.strptime(text, "%Y-%m-%d")
     except ValueError:
         return False, "Date must be a real date in YYYY-MM-DD format (example: 2029-04-13)."
 
-    # strptime accepts 2029-4-13, so compare the text with the standard format.
+    
     if date_object.strftime("%Y-%m-%d") != text:
         return False, "Date must be in YYYY-MM-DD format (example: 2029-04-13)."
     return True, text
@@ -52,8 +50,7 @@ def check_date(value):
 
 def validate_asteroid(asteroid_id, name, diameter, speed, miss_distance,
                       date, existing_ids, check_duplicate=True):
-    # Check every field in order and stop at the first problem.
-    # When all fields are fine, return a dictionary of clean values.
+    
     ok, asteroid_id = check_text(asteroid_id, "Asteroid ID")
     if not ok:
         return False, asteroid_id

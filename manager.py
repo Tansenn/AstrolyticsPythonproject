@@ -1,5 +1,3 @@
-# manager.py
-# The AsteroidManager class stores the records and does all the main work.
 
 import json
 import os
@@ -7,7 +5,7 @@ import os
 from asteroid import Asteroid
 import validation
 
-# Fixed values used across the program.
+
 SIZE_CATEGORIES = ("Small", "Medium", "Large")
 FIELD_NAMES = ["asteroid_id", "name", "diameter_m", "speed_kms",
                "miss_distance_km", "approach_date"]
@@ -17,12 +15,12 @@ class AsteroidManager:
     def __init__(self, data_file, watchlist_file):
         self.data_file = data_file
         self.watchlist_file = watchlist_file
-        self.asteroids = []        # list of Asteroid objects
-        self.ids = set()           # set of unique IDs
-        self.watchlist = {}        # dictionary: asteroid_id -> name
+        self.asteroids = []        
+        self.ids = set()           
+        self.watchlist = {}        
 
     def find_by_id(self, asteroid_id):
-        # Returns one Asteroid, or None when the ID is not in the list.
+       
         asteroid_id = str(asteroid_id).strip()
         for asteroid in self.asteroids:
             if asteroid.asteroid_id == asteroid_id:
@@ -30,7 +28,7 @@ class AsteroidManager:
         return None
 
     def add_asteroid(self, asteroid_id, name, diameter, speed, miss_distance, date):
-        # Validation checks every field, including the duplicate ID.
+       
         ok, result = validation.validate_asteroid(
             asteroid_id, name, diameter, speed, miss_distance, date, self.ids)
         if not ok:
@@ -46,11 +44,11 @@ class AsteroidManager:
         return True, "Asteroid added and saved."
 
     def view_all(self):
-        # A copy is returned so other code cannot change the main list by mistake.
+        
         return list(self.asteroids)
 
     def search(self, text):
-        # Finds part of a name or ID, ignoring capital letters.
+        
         text = str(text).strip().lower()
         if text == "":
             return self.view_all()
@@ -62,7 +60,7 @@ class AsteroidManager:
         return matches
 
     def update_asteroid(self, asteroid_id, name, diameter, speed, miss_distance, date):
-        # The ID is the key, so it stays the same while other fields change.
+       
         asteroid = self.find_by_id(asteroid_id)
         if asteroid is None:
             return False, "Record not found. Nothing was updated."
@@ -131,7 +129,7 @@ class AsteroidManager:
         return True, asteroid.name + " removed from the watchlist."
 
     def view_watchlist(self):
-        # The dictionary stores names, so we look up the full objects here.
+       
         watched = []
         for asteroid_id in self.watchlist:
             asteroid = self.find_by_id(asteroid_id)
@@ -140,13 +138,13 @@ class AsteroidManager:
         return watched
 
     def load_data(self):
-        # Loads both files. Returns a message for the user ("" means all fine).
+        
         self.asteroids = []
         self.ids = set()
         self.watchlist = {}
         messages = []
 
-        # --- Load the asteroid records ---
+       
         loaded_a_list = False
         try:
             with open(self.data_file, "r", encoding="utf-8") as file:
@@ -164,7 +162,7 @@ class AsteroidManager:
                             "Starting with an empty list.")
             records = []
         except ValueError:
-            # Empty or broken JSON also raises ValueError.
+            
             messages.append("asteroids.json is empty or broken. "
                             "Starting with an empty list.")
             records = []
@@ -174,7 +172,7 @@ class AsteroidManager:
 
         skipped = 0
         for record in records:
-            # A record must be a dictionary with all six field names.
+            
             if not isinstance(record, dict) or not all(
                     field in record for field in FIELD_NAMES):
                 skipped += 1
@@ -198,7 +196,7 @@ class AsteroidManager:
         if skipped > 0:
             messages.append(str(skipped) + " bad or duplicate record(s) were skipped.")
 
-        # --- Load the watchlist (a list of asteroid IDs) ---
+       
         try:
             with open(self.watchlist_file, "r", encoding="utf-8") as file:
                 saved_ids = json.load(file)
@@ -208,7 +206,7 @@ class AsteroidManager:
                                 "Starting with an empty watchlist.")
                 saved_ids = []
         except FileNotFoundError:
-            saved_ids = []   # no watchlist yet is normal
+            saved_ids = []   
         except (ValueError, OSError):
             messages.append("watchlist.json is empty or broken. "
                             "Starting with an empty watchlist.")
